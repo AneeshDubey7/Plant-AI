@@ -46,3 +46,5 @@ logs/
 .env.*
 !.env.example
 kaggle.json
+backend/models/*.onnx 
+backend/models/*.pt 
