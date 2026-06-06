@@ -6,8 +6,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import List
 
+from pydantic import validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -26,8 +26,19 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = [
         "http://localhost:5173",
         "http://localhost:3000",
-        "https://plant-disease-app.vercel.app",
+        "https://plant-ai-aneeshdubey7.vercel.app",
     ]
+
+    @validator("CORS_ORIGINS", pre=True)
+    def parse_cors(cls, v):
+        if isinstance(v, str):
+            # Handle both: "url1,url2" and '["url1","url2"]'
+            v = v.strip()
+            if v.startswith("["):
+                import json
+                return json.loads(v)
+            return [i.strip() for i in v.split(",")]
+        return v
 
     # ── Model paths ────────────────────────────────────────────
     BASE_DIR: Path = Path(__file__).resolve().parent.parent
