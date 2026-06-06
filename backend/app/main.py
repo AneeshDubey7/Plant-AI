@@ -6,7 +6,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.v1.router import api_router
 from app.core.config import settings
@@ -54,9 +53,6 @@ def create_application() -> FastAPI:
 
     # ── Routes ──────────────────────────────────────────────────
     app.include_router(api_router, prefix="/api/v1")
-
-    # ── Prometheus metrics ──────────────────────────────────────
-    Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
     return app
 
