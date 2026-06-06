@@ -1,0 +1,33 @@
+# render.yaml — Render Blueprint for one-click deployment
+# Documentation: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: plantai-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter           # $7/month — no cold starts
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: DEBUG
+        value: "false"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: MAX_IMAGE_SIZE_MB
+        value: "10"
+      - key: MODEL_SPECIES_PATH
+        value: models/species_efficientnet_b3.onnx
+      - key: MODEL_DISEASE_PATH
+        value: models/disease_efficientnet_b3.onnx
+      # Set these to your model download URLs (S3 / HuggingFace)
+      - key: SPECIES_MODEL_URL
+        sync: false          # Fill in Render dashboard (sensitive)
+      - key: DISEASE_MODEL_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false          # Fill with your Vercel URL
+    disk:
+      name: model-storage
+      mountPath: /app/models
+      sizeGB: 2

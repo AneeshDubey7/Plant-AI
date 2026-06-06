@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #16a34a;
+    --color-primary-dark: #166534;
+    --color-accent: #da882b;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply bg-stone-50 text-stone-900 antialiased;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-leaf-600 hover:bg-leaf-700 text-white font-semibold 
+           px-6 py-3 rounded-xl transition-all duration-200 
+           shadow-md hover:shadow-lg active:scale-95;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-stone-100 p-6;
+  }
+
+  .badge-healthy {
+    @apply bg-leaf-100 text-leaf-700 border border-leaf-200 
+           text-xs font-semibold px-2.5 py-1 rounded-full;
+  }
+
+  .badge-disease {
+    @apply bg-red-100 text-red-700 border border-red-200 
+           text-xs font-semibold px-2.5 py-1 rounded-full;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { @apply bg-stone-100; }
+::-webkit-scrollbar-thumb { @apply bg-leaf-300 rounded-full; }
+::-webkit-scrollbar-thumb:hover { @apply bg-leaf-500; }
+
+/* Loading shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}

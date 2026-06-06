@@ -1,0 +1,63 @@
+version: "3.9"
+
+# ── Plant Disease Prediction System — Docker Compose ──────────────────────────
+# Usage:
+#   docker-compose up --build          # start everything
+#   docker-compose up backend          # start backend only
+#   docker-compose logs -f backend     # tail logs
+#   docker-compose down -v             # stop and remove volumes
+
+services:
+
+  # ── FastAPI Backend ──────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: plantai-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount trained ONNX model files from host
+      - ./backend/models:/app/models:ro
+      # Persist logs
+      - ./backend/logs:/app/logs
+    environment:
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      - MAX_IMAGE_SIZE_MB=10
+      - CORS_ORIGINS=["http://localhost:5173","http://localhost:80","http://frontend"]
+      # Set these paths to your ONNX model files inside the container
+      - MODEL_SPECIES_PATH=models/species_efficientnet_b3.onnx
+      - MODEL_DISEASE_PATH=models/disease_efficientnet_b3.onnx
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - plantai-net
+
+  # ── React Frontend (nginx) ───────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:8000
+    container_name: plantai-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - plantai-net
+
+networks:
+  plantai-net:
+    driver: bridge
